@@ -1,9 +1,11 @@
 import { Request, Response, Router } from 'express';
+import { getAllProducts } from './service';
 
 const router: Router = Router();
 
-router.get('/', (req: Request, res: Response) => {
-  res.status(200).send('Get all products');
+router.get('/', async (req: Request, res: Response) => {
+  const products = await getAllProducts();
+  res.status(200).json(products).send();
 });
 
 router.get('/:id', (req: Request, res: Response) => {
