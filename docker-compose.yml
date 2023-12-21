@@ -28,7 +28,7 @@ services:
   data_db:
     image: postgres:alpine
     ports:
-      - 25435:5432
+      - 15435:5432
     volumes:
       - ./volume_data:/var/lib/postgresql/data
     environment:
@@ -38,7 +38,7 @@ services:
   product_db:
     image: postgres:alpine
     ports:
-      - 15435:5432
+      - 25435:5432
     volumes:
       - ./volume_product:/var/lib/postgresql/data
     environment:
