@@ -13,8 +13,16 @@ async function createProduct(data: Prisma.ProductCreateInput) {
   return await prisma.product.create({ data })
 }
 
+async function updateProduct(id: number, data: Prisma.ProductUpdateInput) {
+  return await prisma.product.update({
+    where: { id },
+    data
+  });
+}
+
 export {
   getAllProducts,
   getProduct,
   createProduct,
+  updateProduct,
 }

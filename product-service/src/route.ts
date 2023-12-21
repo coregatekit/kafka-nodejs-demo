@@ -1,6 +1,6 @@
 import { Prisma } from '@prisma/client';
 import { Request, Response, Router } from 'express';
-import { createProduct, getAllProducts, getProduct } from './service';
+import { updateProduct, createProduct, getAllProducts, getProduct } from './service';
 
 const router: Router = Router();
 
@@ -25,9 +25,11 @@ router.post('/', async (req: Request, res: Response) => {
   res.status(201).json(product).send();
 });
 
-router.patch('/:id', (req: Request, res: Response) => {
+router.patch('/:id', async (req: Request, res: Response) => {
   const id = req.params.id;
-  res.status(200).send(`Update product id = ${id}`);
+  const input: Prisma.ProductUpdateInput = req.body;
+  const product = await updateProduct(parseInt(id), input);
+  res.status(200).json(product).send();
 });
 
 router.delete('/:id', (req: Request, res: Response) => {
