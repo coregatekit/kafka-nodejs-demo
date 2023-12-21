@@ -4,7 +4,7 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 const CURRENT_HOST = os.hostname();
-const PORT = process.env.PORT || 9001;
+const PORT = process.env.PORT || 9000;
 const KAFKA_HOST = process.env.KAFKA_HOST || '';
 const KAFKA_TOPIC_PRODUCT_CREATE = process.env.KAFKA_TOPIC_PRODUCT_CREATE || '';
 
