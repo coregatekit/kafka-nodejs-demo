@@ -1,6 +1,6 @@
 import { Prisma } from '@prisma/client';
 import { Request, Response, Router } from 'express';
-import { updateProduct, createProduct, getAllProducts, getProduct } from './service';
+import { updateProduct, createProduct, getAllProducts, getProduct, deleteProduct } from './service';
 
 const router: Router = Router();
 
@@ -32,9 +32,10 @@ router.patch('/:id', async (req: Request, res: Response) => {
   res.status(200).json(product).send();
 });
 
-router.delete('/:id', (req: Request, res: Response) => {
+router.delete('/:id', async (req: Request, res: Response) => {
   const id = req.params.id;
-  res.status(200).send(`Delete product id = ${id}`);
+  await deleteProduct(parseInt(id));
+  res.status(204).send();
 });
 
 export default router;

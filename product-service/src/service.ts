@@ -20,9 +20,14 @@ async function updateProduct(id: number, data: Prisma.ProductUpdateInput) {
   });
 }
 
+async function deleteProduct(id: number) {
+  return await prisma.product.delete({ where: { id } });
+}
+
 export {
   getAllProducts,
   getProduct,
   createProduct,
   updateProduct,
+  deleteProduct,
 }
