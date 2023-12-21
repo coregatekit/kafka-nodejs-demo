@@ -1,5 +1,6 @@
+import { Prisma } from '@prisma/client';
 import { Request, Response, Router } from 'express';
-import { getAllProducts, getProduct } from './service';
+import { createProduct, getAllProducts, getProduct } from './service';
 
 const router: Router = Router();
 
@@ -13,12 +14,15 @@ router.get('/:id', async (req: Request, res: Response) => {
   const product = await getProduct(parseInt(id));
   if (!product) {
     res.status(400).json({ msg: 'Product not found' }).send();
+    return;
   }
   res.status(200).json(product).send();
 });
 
-router.post('/', (req: Request, res: Response) => {
-  res.status(200).send('Create new product');
+router.post('/', async (req: Request, res: Response) => {
+  const input: Prisma.ProductCreateInput = req.body;
+  const product = await createProduct(input);
+  res.status(201).json(product).send();
 });
 
 router.patch('/:id', (req: Request, res: Response) => {
