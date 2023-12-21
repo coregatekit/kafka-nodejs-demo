@@ -7,14 +7,14 @@ const produce = async (topic: string, messages: Message[]) => {
   await producer.connect();
 
   try {
+    console.log('Producing messages...');
     await producer.send({
       topic,
       messages,
     });
+    console.log('Finish produce messages');
   } catch (error) {
     console.error(error);
-  } finally {
-    await producer.disconnect();
   }
 }
 

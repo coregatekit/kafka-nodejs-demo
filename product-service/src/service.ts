@@ -1,5 +1,9 @@
 import { Prisma } from '@prisma/client';
+import { Message } from 'kafkajs';
+
 import prisma from './database';
+import { produce } from './producer';
+import { KAFKA_TOPICS } from './enum';
 
 async function getAllProducts() {
   return await prisma.product.findMany();
@@ -10,7 +14,16 @@ async function getProduct(id: number) {
 }
 
 async function createProduct(data: Prisma.ProductCreateInput) {
-  return await prisma.product.create({ data })
+  const product = await prisma.product.create({ data })
+
+  const json = JSON.stringify(product);
+  const buffer = Buffer.from(json);
+  const payload: Message[] = [{
+    value: buffer,
+  }];
+  await produce(KAFKA_TOPICS.KAFKA_TOPIC_PRODUCT_CREATE, payload);
+
+  return product;
 }
 
 async function updateProduct(id: number, data: Prisma.ProductUpdateInput) {
