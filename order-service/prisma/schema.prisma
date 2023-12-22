@@ -33,4 +33,6 @@ enum PaymentStatus {
   PENDING
   PAID
   CANCELED
+  FAILED
+  STOCK_NOT_ENOUGH
 }
