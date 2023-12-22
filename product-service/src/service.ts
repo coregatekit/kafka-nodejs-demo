@@ -44,7 +44,18 @@ async function updateProduct(id: number, data: Prisma.ProductUpdateInput) {
 }
 
 async function deleteProduct(id: number) {
-  return await prisma.product.delete({ where: { id } });
+  const result = await prisma.product.delete({ where: { id } });
+
+  if (result) {
+    const json = JSON.stringify({ code: result.code });
+    const buffer = Buffer.from(json);
+    const payload: Message[] = [{
+      value: buffer,
+    }];
+    await produce(KAFKA_TOPICS.KAFKA_TOPIC_PRODUCT_DELETE, payload);
+  }
+
+  return result;
 }
 
 export {

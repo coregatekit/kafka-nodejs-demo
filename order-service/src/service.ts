@@ -26,7 +26,16 @@ async function updateProduct(msg: Prisma.ProductUpdateInput) {
   }
 }
 
+async function deleteProduct(code: string) {
+  const result = await prisma.product.delete({ where: { code } });
+
+  if (result) {
+    console.log(`Product ${result.title} has bee delete.`);
+  }
+}
+
 export {
   createNewProduct,
   updateProduct,
+  deleteProduct,
 }
