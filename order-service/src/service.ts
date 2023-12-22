@@ -1,5 +1,8 @@
 import { PaymentStatus, Prisma } from '@prisma/client';
 import prisma from './database';
+import { Message } from 'kafkajs';
+import { produce } from './producer';
+import { KAFKA_TOPICS } from './enum';
 
 async function getOrderDetail(options: Prisma.OrderWhereInput) {
   return await prisma.order.findFirst({
@@ -36,7 +39,14 @@ async function paidOrder(code: string) {
     },
   });
 
-  // update product stock
+  const json = JSON.stringify({
+    stock: order.amount,
+  });
+  const buffer = Buffer.from(json);
+  const payload: Message[] = [{
+    value: buffer,
+  }];
+  await produce(KAFKA_TOPICS.KAFKA_TOPIC_PRODUCT_CREATE, payload);
 
   return order;
 }
