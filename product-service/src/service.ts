@@ -27,7 +27,7 @@ async function createProduct(data: Prisma.ProductCreateInput) {
 }
 
 async function updateProduct(id: number, data: Prisma.ProductUpdateInput) {
-  return await prisma.product.update({
+  const product = await prisma.product.update({
     where: { id },
     data
   });
