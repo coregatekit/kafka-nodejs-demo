@@ -58,10 +58,27 @@ async function deleteProduct(id: number) {
   return result;
 }
 
+async function updateStock(data: Prisma.ProductUpdateInput) {
+  const product = await prisma.product.findFirst({ where: { code: data.code as string } });
+
+  if (product) {
+    product.stock -= data.stock as number;
+
+    if (product.stock < 0) {
+      // produce not enough product
+    }
+
+    // produce completed
+  }
+
+  // produce error not found
+}
+
 export {
   getAllProducts,
   getProduct,
   createProduct,
   updateProduct,
   deleteProduct,
+  updateStock,
 }
