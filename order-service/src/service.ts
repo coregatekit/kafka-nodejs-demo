@@ -4,6 +4,7 @@ import prisma from './database';
 async function createNewProduct(msg: Prisma.ProductCreateInput) {
   const product = await prisma.product.create({
     data: {
+      code: msg.code,
       title: msg.title,
       price: msg.price,
     },
@@ -14,18 +15,18 @@ async function createNewProduct(msg: Prisma.ProductCreateInput) {
   }
 }
 
-async function updateProduct(msg: Prisma.ProductUpdateInput) {
-  const product = await prisma.product.update({
-    where: { id: parseInt(msg.id!.toString()) },
-    data: msg
-  });
+// async function updateProduct(msg: Prisma.ProductUpdateInput) {
+//   const product = await prisma.product.update({
+//     where: { id: parseInt(msg.id!.toString()) },
+//     data: msg
+//   });
 
-  if (product) {
-    console.log(`Product ${product.title} has been update.`);
-  }
-}
+//   if (product) {
+//     console.log(`Product ${product.title} has been update.`);
+//   }
+// }
 
 export {
   createNewProduct,
-  updateProduct,
+  // updateProduct,
 }

@@ -14,6 +14,7 @@ async function getProduct(id: number) {
 }
 
 async function createProduct(data: Prisma.ProductCreateInput) {
+  data.code = Date.now().toString();
   const product = await prisma.product.create({ data })
 
   const json = JSON.stringify(product);

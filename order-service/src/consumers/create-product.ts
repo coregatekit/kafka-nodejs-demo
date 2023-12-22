@@ -18,6 +18,7 @@ const consumeCreateProduct = async () => {
         const parsed = JSON.parse(message);
         const product = {
           id: parsed.id,
+          code: parsed.code,
           title: parsed.title,
           price: parsed.price,
         } as Prisma.ProductCreateInput;
