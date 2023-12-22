@@ -3,7 +3,7 @@ import { Message } from 'kafkajs';
 
 import prisma from './database';
 import { produce } from './producer';
-import { KAFKA_TOPICS } from './enum';
+import { KAFKA_TOPICS, UPDATE_STOCK_STATUS } from './enum';
 
 async function getAllProducts() {
   return await prisma.product.findMany();
@@ -59,19 +59,48 @@ async function deleteProduct(id: number) {
 }
 
 async function updateStock(data: Prisma.ProductUpdateInput) {
-  const product = await prisma.product.findFirst({ where: { code: data.code as string } });
+  try {
+    const product = await prisma.product.findFirst({ where: { code: data.code as string } });
 
-  if (product) {
-    product.stock -= data.stock as number;
+    if (product) {
+      product.stock -= data.stock as number;
 
-    if (product.stock < 0) {
-      // produce not enough product
+      if (product.stock < 0) {
+        // produce not enough product
+        const json = JSON.stringify({ code: product.code, status: UPDATE_STOCK_STATUS.NOT_ENOUGH });
+        const buffer = Buffer.from(json);
+        const payload: Message[] = [{
+          value: buffer,
+        }];
+        await produce(KAFKA_TOPICS.KAFKA_TOPIC_ORDER_UPDATE_STOCK_STATUS, payload);
+      }
+
+      // produce completed
+      const json = JSON.stringify({ code: product.code, status: UPDATE_STOCK_STATUS.SUCCESS });
+      const buffer = Buffer.from(json);
+      const payload: Message[] = [{
+        value: buffer,
+      }];
+      await produce(KAFKA_TOPICS.KAFKA_TOPIC_ORDER_UPDATE_STOCK_STATUS, payload);
     }
 
-    // produce completed
+    // produce error not found
+    const json = JSON.stringify({ code: data.code, status: UPDATE_STOCK_STATUS.NOT_FOUND });
+    const buffer = Buffer.from(json);
+    const payload: Message[] = [{
+      value: buffer,
+    }];
+    await produce(KAFKA_TOPICS.KAFKA_TOPIC_ORDER_UPDATE_STOCK_STATUS, payload);
+  } catch (error) {
+    console.error(error);
+    // produce error
+    const json = JSON.stringify({ code: data.code, status: UPDATE_STOCK_STATUS.FAILED });
+    const buffer = Buffer.from(json);
+    const payload: Message[] = [{
+      value: buffer,
+    }];
+    await produce(KAFKA_TOPICS.KAFKA_TOPIC_ORDER_UPDATE_STOCK_STATUS, payload);
   }
-
-  // produce error not found
 }
 
 export {
