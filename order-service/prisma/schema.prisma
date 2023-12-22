@@ -21,7 +21,8 @@ model Order {
 }
 
 model Product {
-  id    Int     @id
+  id    Int     @id @default(autoincrement())
+  code  String  @unique
   title String  @db.VarChar(255)
   price Float   @default(0.0)
   Order Order[]
