@@ -15,18 +15,18 @@ async function createNewProduct(msg: Prisma.ProductCreateInput) {
   }
 }
 
-// async function updateProduct(msg: Prisma.ProductUpdateInput) {
-//   const product = await prisma.product.update({
-//     where: { id: parseInt(msg.id!.toString()) },
-//     data: msg
-//   });
+async function updateProduct(msg: Prisma.ProductUpdateInput) {
+  const product = await prisma.product.update({
+    where: { code: msg.code as string },
+    data: msg
+  });
 
-//   if (product) {
-//     console.log(`Product ${product.title} has been update.`);
-//   }
-// }
+  if (product) {
+    console.log(`Product ${product.title} has been update.`);
+  }
+}
 
 export {
   createNewProduct,
-  // updateProduct,
+  updateProduct,
 }
