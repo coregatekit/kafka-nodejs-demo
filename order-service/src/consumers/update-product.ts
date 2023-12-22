@@ -2,14 +2,14 @@ import { EachMessagePayload } from 'kafkajs';
 import { CURRENT_HOST } from '../config';
 import kafka from '../kafka';
 import { Prisma } from '@prisma/client';
-import { createNewProduct } from '../service';
+import { updateProduct } from '../service';
 import { KAFKA_TOPICS } from '../enum';
 
-const consumer = kafka.consumer({ groupId: `order-service-product-create` });
+const consumer = kafka.consumer({ groupId: `order-service-product-update` });
 
-const consumeCreateProduct = async () => {
+const consumeUpdateProduct = async () => {
   await consumer.connect();
-  await consumer.subscribe({ topic: KAFKA_TOPICS.KAFKA_TOPIC_PRODUCT_CREATE, fromBeginning: true });
+  await consumer.subscribe({ topic: KAFKA_TOPICS.KAFKA_TOPIC_PRODUCT_UPDATE, fromBeginning: true });
   await consumer.run({
     eachMessage: async (payload: EachMessagePayload) => {
       const message = payload.message.value?.toString('utf8');
@@ -20,12 +20,12 @@ const consumeCreateProduct = async () => {
           id: parsed.id,
           title: parsed.title,
           price: parsed.price,
-        } as Prisma.ProductCreateInput;
-        await createNewProduct(product);
+        } as Prisma.ProductUpdateInput;
+        await updateProduct(product);
       }
       console.log(message);
     }
   })
 }
 
-export default consumeCreateProduct;
+export default consumeUpdateProduct;

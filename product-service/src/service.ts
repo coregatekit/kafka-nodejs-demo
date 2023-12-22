@@ -31,6 +31,15 @@ async function updateProduct(id: number, data: Prisma.ProductUpdateInput) {
     where: { id },
     data
   });
+
+  const json = JSON.stringify(product);
+  const buffer = Buffer.from(json);
+  const payload: Message[] = [{
+    value: buffer,
+  }];
+  await produce(KAFKA_TOPICS.KAFKA_TOPIC_PRODUCT_UPDATE, payload);
+
+  return product;
 }
 
 async function deleteProduct(id: number) {
