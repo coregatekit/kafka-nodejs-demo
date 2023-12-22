@@ -2,7 +2,8 @@ import { PaymentStatus, Prisma } from '@prisma/client';
 import prisma from './database';
 import { Message } from 'kafkajs';
 import { produce } from './producer';
-import { KAFKA_TOPICS } from './enum';
+import { KAFKA_TOPICS, UPDATE_STOCK_STATUS } from './enum';
+import { StockUpdateStatus } from './consumers/update-stock-status';
 
 async function getOrderDetail(options: Prisma.OrderWhereInput) {
   return await prisma.order.findFirst({
@@ -35,7 +36,7 @@ async function paidOrder(code: string) {
   const order = await prisma.order.update({
     where: { code },
     data: {
-      paymentStatus: PaymentStatus.PAID,
+      paymentStatus: PaymentStatus.PENDING,
     },
   });
 
@@ -80,6 +81,51 @@ async function createNewProduct(msg: Prisma.ProductCreateInput) {
   }
 }
 
+async function updateStockStatus(data: StockUpdateStatus) {
+  try {
+    switch (data.status) {
+      case UPDATE_STOCK_STATUS.FAILED:
+        await prisma.order.update({
+          where: { code: data.code },
+          data: {
+            paymentStatus: PaymentStatus.FAILED,
+          },
+        });
+        console.log(`Payment failed because some error has occured on product service!`);
+        break;
+      case UPDATE_STOCK_STATUS.NOT_ENOUGH:
+        await prisma.order.update({
+          where: { code: data.code },
+          data: {
+            paymentStatus: PaymentStatus.STOCK_NOT_ENOUGH,
+          },
+        });
+        console.log(`Payment failed because product ${data.code} not enough!`);
+        break;
+      case UPDATE_STOCK_STATUS.NOT_FOUND:
+        await prisma.order.update({
+          where: { code: data.code },
+          data: {
+            paymentStatus: PaymentStatus.STOCK_NOT_ENOUGH,
+          },
+        });
+        console.log(`Payment failed because product ${data.code} not found!`);
+        break;
+      case UPDATE_STOCK_STATUS.SUCCESS:
+        await prisma.order.update({
+          where: { code: data.code },
+          data: {
+            paymentStatus: PaymentStatus.PAID,
+          },
+        });
+        console.log(`Payment success!`);
+        break;
+    }
+  } catch (error) {
+    console.error(error);
+  }
+}
+
 async function updateProduct(msg: Prisma.ProductUpdateInput) {
   const product = await prisma.product.update({
     where: { code: msg.code as string },
@@ -107,6 +153,7 @@ export {
   paidOrder,
   cancelOrder,
   deleteOrder,
+  updateStockStatus,
   createNewProduct,
   updateProduct,
   deleteProduct,

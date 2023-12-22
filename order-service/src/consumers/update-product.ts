@@ -1,5 +1,4 @@
 import { EachMessagePayload } from 'kafkajs';
-import { CURRENT_HOST } from '../config';
 import kafka from '../kafka';
 import { Prisma } from '@prisma/client';
 import { updateProduct } from '../service';

@@ -1,5 +1,4 @@
 import { EachMessagePayload } from 'kafkajs';
-import { CURRENT_HOST } from '../config';
 import kafka from '../kafka';
 import { deleteProduct } from '../service';
 import { KAFKA_TOPICS } from '../enum';
